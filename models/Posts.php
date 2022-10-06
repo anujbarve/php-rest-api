@@ -68,7 +68,7 @@ class Post
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         // set properties
         $this->title = $row['title'];
         $this->body = $row['body'];
@@ -78,10 +78,11 @@ class Post
     }
 
     // Create Post
-    public function create(){
+    public function create()
+    {
         // Create Query
 
-        $query = 'INSERT INTO '.$this->table.' 
+        $query = 'INSERT INTO ' . $this->table . ' 
          SET 
         title = :title,
         body = :body,
@@ -104,7 +105,75 @@ class Post
         $stmt->bindParam(':category_id', $this->category_id);
 
         // execute query
-        if($stmt->execute()){
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        // print error if something goes wrong
+
+        printf("ERROR : %s.\n", $stmt->error);
+
+        return false;
+    }
+
+    // Create Post
+    public function update()
+    {
+        // Create Query
+
+        $query = 'UPDATE ' . $this->table . ' 
+         SET 
+        title = :title,
+        body = :body,
+        author = :author,
+        category_id = :category_id WHERE id = :id';
+
+        // prepare statement
+        $stmt = $this->conn->prepare($query);
+
+        // clean data
+        $this->title = htmlspecialchars(strip_tags($this->title));
+        $this->body = htmlspecialchars(strip_tags($this->body));
+        $this->author = htmlspecialchars(strip_tags($this->author));
+        $this->category_id = htmlspecialchars(strip_tags($this->category_id));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        // bind data
+        $stmt->bindParam(':title', $this->title);
+        $stmt->bindParam(':body', $this->body);
+        $stmt->bindParam(':author', $this->author);
+        $stmt->bindParam(':category_id', $this->category_id);
+        $stmt->bindParam(':id', $this->id);
+
+        // execute query
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        // print error if something goes wrong
+
+        printf("ERROR : %s.\n", $stmt->error);
+
+        return false;
+    }
+
+    // Delete Post
+    public function delete()
+    {
+        // Create Query
+        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+
+        // prepare statement
+        $stmt = $this->conn->prepare($query);
+
+        // clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        // bind data
+        $stmt->bindParam(':id', $this->id);
+
+        // execute query
+        if ($stmt->execute()) {
             return true;
         }
 
